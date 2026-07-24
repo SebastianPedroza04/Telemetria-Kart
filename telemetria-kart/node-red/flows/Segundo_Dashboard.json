@@ -1,0 +1,788 @@
+[
+    {
+        "id": "f3aa4012cfc3fa44",
+        "type": "tab",
+        "label": "Flujo 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "ac77f87818a49294",
+        "type": "debug",
+        "z": "f3aa4012cfc3fa44",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "9b4764288b569459",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "telemetria",
+        "func": "// Formato nuevo recibido desde la ESP32 base:\n// seq,t_ms,roll,pitch,g_lat,g_lon,yaw_rate,lat,lon,gps_speed_mps,\n// gps_course_deg,gps_sats,gps_hdop,gps_fix,rssi,snr,lost,total\n\nlet line = msg.payload.toString().trim();\n\nif (!line) return null;\n\nif (\n    line.startsWith(\"#\") ||\n    line.startsWith(\"seq\") ||\n    line.startsWith(\"===\") ||\n    line.startsWith(\"LoRa\") ||\n    line.startsWith(\"ERROR\") ||\n    line.startsWith(\"ets\") ||\n    line.startsWith(\"rst:\")\n) {\n    return null;\n}\n\nlet p = line.split(\",\");\n\nif (p.length < 18) {\n    return null;\n}\n\nlet data = {\n    seq: Number(p[0]),\n    t_ms: Number(p[1]),\n    roll: Number(p[2]),\n    pitch: Number(p[3]),\n    g_lat: Number(p[4]),\n    g_lon: Number(p[5]),\n    yaw_rate: Number(p[6]),\n    lat: Number(p[7]),\n    lon: Number(p[8]),\n    gps_speed_mps: Number(p[9]),\n    gps_course_deg: Number(p[10]),\n    gps_sats: Number(p[11]),\n    gps_hdop: Number(p[12]),\n    gps_fix: Number(p[13]),\n    rssi: Number(p[14]),\n    snr: Number(p[15]),\n    lost: Number(p[16]),\n    total: Number(p[17])\n};\n\nif (\n    Number.isNaN(data.seq) ||\n    Number.isNaN(data.roll) ||\n    Number.isNaN(data.pitch) ||\n    Number.isNaN(data.rssi)\n) {\n    return null;\n}\n\nmsg.payload = data;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 200,
+        "y": 100,
+        "wires": [
+            [
+                "ac77f87818a49294",
+                "31482f6065502e8c",
+                "97d2fe181491de2b",
+                "5871c8fc72cb3df2",
+                "94d282f6d4675e4a",
+                "a7239f2d802685ed",
+                "dbc4bfa0c5dc1f7e",
+                "2ef30c028d290dc3",
+                "c6350b709dc6427e",
+                "b2803b1a237a642f",
+                "5afa6de94dd352da",
+                "6d5ef51088700432",
+                "0f1282a76aa27dbe",
+                "9935715b07b9784c",
+                "b437a31a8282a649",
+                "71367b057f323ccc",
+                "63fe51de0dbb9024",
+                "5a0f6d64f29ca61d",
+                "d35cb97722851c9e"
+            ]
+        ]
+    },
+    {
+        "id": "0c7fd493c35ba134",
+        "type": "serial in",
+        "z": "f3aa4012cfc3fa44",
+        "name": "",
+        "serial": "9aa00f516edbe481",
+        "x": 50,
+        "y": 100,
+        "wires": [
+            [
+                "9b4764288b569459"
+            ]
+        ]
+    },
+    {
+        "id": "31482f6065502e8c",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "roll",
+        "func": "msg.payload = Number(msg.payload.roll);\nmsg.topic = \"Roll\";\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "97d2fe181491de2b",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "pitch",
+        "func": "msg.payload = Number(msg.payload.pitch);\nmsg.topic = \"Pitch\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5871c8fc72cb3df2",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "g_lat",
+        "func": "msg.payload = Number(msg.payload.g_lat);\nmsg.topic = \"G lateral\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "94d282f6d4675e4a",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "rssi",
+        "func": "msg.payload = Number(msg.payload.rssi);\nmsg.topic = \"RSSI\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a7239f2d802685ed",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "G longitudinal",
+        "func": "msg.payload = Number(msg.payload.g_lon);\nmsg.topic = \"G longitudinal\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dbc4bfa0c5dc1f7e",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "Yaw rate",
+        "func": "msg.payload = Number(msg.payload.yaw_rate);\nmsg.topic = \"Yaw rate\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2ef30c028d290dc3",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "SNR",
+        "func": "msg.payload = Number(msg.payload.snr);\nmsg.topic = \"SNR\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c6350b709dc6427e",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "Paquetes perdidos",
+        "func": "msg.payload = Number(msg.payload.lost);\nmsg.topic = \"Paquetes perdidos\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5afa6de94dd352da",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "GPS Fix",
+        "func": "msg.payload = Number(msg.payload.gps_fix) === 1 ? \"FIX GPS\" : \"SIN FIX\";\nmsg.topic = \"Estado GPS\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6d5ef51088700432",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "Satélites GPS",
+        "func": "msg.payload = Number(msg.payload.gps_sats);\nmsg.topic = \"Satélites GPS\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0f1282a76aa27dbe",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "HDOP",
+        "func": "let fix = Number(msg.payload.gps_fix);\nlet hdop = Number(msg.payload.gps_hdop);\n\nmsg.payload = fix === 1 ? hdop : 10;\nmsg.topic = \"HDOP\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9935715b07b9784c",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "Velocidad GPS",
+        "func": "let fix = Number(msg.payload.gps_fix);\nlet v = Number(msg.payload.gps_speed_mps);\n\nmsg.payload = fix === 1 ? v : 0;\nmsg.topic = \"Velocidad GPS\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b437a31a8282a649",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "Latitud",
+        "func": "let fix = Number(msg.payload.gps_fix);\nlet lat = Number(msg.payload.lat);\n\nmsg.payload = fix === 1 ? lat.toFixed(6) : \"Sin señal\";\nmsg.topic = \"Latitud\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "71367b057f323ccc",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "Longitud",
+        "func": "let fix = Number(msg.payload.gps_fix);\nlet lon = Number(msg.payload.lon);\n\nmsg.payload = fix === 1 ? lon.toFixed(6) : \"Sin señal\";\nmsg.topic = \"Longitud\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 780,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "63fe51de0dbb9024",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "Rumbo GPS",
+        "func": "let fix = Number(msg.payload.gps_fix);\nlet course = Number(msg.payload.gps_course_deg);\n\nmsg.payload = fix === 1 ? course : 0;\nmsg.topic = \"Rumbo GPS\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b2803b1a237a642f",
+        "type": "ui-template",
+        "z": "f3aa4012cfc3fa44",
+        "group": "77c4effe944a6bc8",
+        "page": "",
+        "ui": "",
+        "name": "Monitoreo en vivo",
+        "order": 0,
+        "width": "6",
+        "height": "20",
+        "head": "",
+        "format": "<template>\n  <div class=\"tk-dashboard\" v-if=\"msg && msg.payload\">\n\n    <!-- ENCABEZADO -->\n    <div class=\"tk-hero\">\n      <div>\n        <div class=\"tk-title\">Monitoreo en vivo</div>\n        <div class=\"tk-subtitle\">\n          Último paquete recibido: #{{ Number(msg.payload.seq || 0) }}\n        </div>\n      </div>\n\n      <div class=\"tk-live\">\n        <span class=\"tk-dot\"></span>\n        EN VIVO\n      </div>\n    </div>\n\n    <!-- RESUMEN -->\n    <div class=\"tk-status-row\">\n      <div class=\"tk-status-card\">\n        <span>Paquete</span>\n        <strong>#{{ Number(msg.payload.seq || 0) }}</strong>\n      </div>\n\n      <div class=\"tk-status-card\">\n        <span>Tiempo</span>\n        <strong>{{ (Number(msg.payload.t_ms || 0) / 1000).toFixed(1) }} s</strong>\n      </div>\n\n      <div class=\"tk-status-card\">\n        <span>Total RX</span>\n        <strong>{{ Number(msg.payload.total || 0) }}</strong>\n      </div>\n    </div>\n\n    <!-- ENLACE -->\n    <section class=\"tk-section\">\n      <div class=\"tk-section-title\">\n        <span>Enlace inalámbrico</span>\n        <small>RSSI · SNR · pérdidas</small>\n      </div>\n\n      <div class=\"tk-grid\">\n        <div class=\"tk-card\">\n          <div class=\"tk-label\">RSSI</div>\n          <div class=\"tk-value\">{{ Number(msg.payload.rssi || 0).toFixed(0) }} <span>dBm</span></div>\n          <div class=\"tk-bar\">\n            <div\n              class=\"tk-fill\"\n              :style=\"{ width: Math.max(0, Math.min(100, ((Number(msg.payload.rssi || -120) + 120) / 100) * 100)) + '%' }\">\n            </div>\n          </div>\n          <div class=\"tk-note\">\n            {{ Number(msg.payload.rssi || -120) > -70 ? 'Señal buena' : 'Señal débil' }}\n          </div>\n        </div>\n\n        <div class=\"tk-card\">\n          <div class=\"tk-label\">SNR</div>\n          <div class=\"tk-value\">{{ Number(msg.payload.snr || 0).toFixed(2) }} <span>dB</span></div>\n          <div class=\"tk-bar\">\n            <div\n              class=\"tk-fill\"\n              :style=\"{ width: Math.max(0, Math.min(100, ((Number(msg.payload.snr || -20) + 20) / 40) * 100)) + '%' }\">\n            </div>\n          </div>\n          <div class=\"tk-note\">\n            {{ Number(msg.payload.snr || 0) > 0 ? 'Enlace estable' : 'Ruido alto' }}\n          </div>\n        </div>\n\n        <div class=\"tk-card tk-wide\">\n          <div class=\"tk-label\">Paquetes perdidos</div>\n          <div class=\"tk-value\">{{ Number(msg.payload.lost || 0) }}</div>\n          <div class=\"tk-note\">\n            Pérdida acumulada:\n            {{\n              (\n                100 * Number(msg.payload.lost || 0) /\n                Math.max(1, Number(msg.payload.lost || 0) + Number(msg.payload.total || 0))\n              ).toFixed(1)\n            }} %\n          </div>\n        </div>\n      </div>\n    </section>\n\n    <!-- ORIENTACIÓN -->\n    <section class=\"tk-section\">\n      <div class=\"tk-section-title\">\n        <span>Orientación y giro</span>\n        <small>Roll · Pitch · Yaw rate</small>\n      </div>\n\n      <div class=\"tk-grid\">\n        <div class=\"tk-card\">\n          <div class=\"tk-label\">Roll</div>\n          <div class=\"tk-value\">{{ Number(msg.payload.roll || 0).toFixed(2) }} <span>°</span></div>\n          <div class=\"tk-mini-scale\">\n            <span>-180</span>\n            <div class=\"tk-scale-line\">\n              <div\n                class=\"tk-marker\"\n                :style=\"{ left: Math.max(0, Math.min(100, ((Number(msg.payload.roll || 0) + 180) / 360) * 100)) + '%' }\">\n              </div>\n            </div>\n            <span>180</span>\n          </div>\n        </div>\n\n        <div class=\"tk-card\">\n          <div class=\"tk-label\">Pitch</div>\n          <div class=\"tk-value\">{{ Number(msg.payload.pitch || 0).toFixed(2) }} <span>°</span></div>\n          <div class=\"tk-mini-scale\">\n            <span>-90</span>\n            <div class=\"tk-scale-line\">\n              <div\n                class=\"tk-marker\"\n                :style=\"{ left: Math.max(0, Math.min(100, ((Number(msg.payload.pitch || 0) + 90) / 180) * 100)) + '%' }\">\n              </div>\n            </div>\n            <span>90</span>\n          </div>\n        </div>\n\n        <div class=\"tk-card tk-wide\">\n          <div class=\"tk-label\">Yaw rate</div>\n          <div class=\"tk-value\">{{ Number(msg.payload.yaw_rate || 0).toFixed(2) }} <span>°/s</span></div>\n          <div class=\"tk-note\">Velocidad angular de giro</div>\n        </div>\n      </div>\n    </section>\n\n    <!-- DINÁMICA -->\n    <section class=\"tk-section\">\n      <div class=\"tk-section-title\">\n        <span>Dinámica del movimiento</span>\n        <small>Aceleración y velocidad</small>\n      </div>\n\n      <div class=\"tk-grid\">\n        <div class=\"tk-card\">\n          <div class=\"tk-label\">G lateral</div>\n          <div class=\"tk-value\">{{ Number(msg.payload.g_lat || 0).toFixed(3) }} <span>G</span></div>\n          <div class=\"tk-mini-scale\">\n            <span>-3</span>\n            <div class=\"tk-scale-line\">\n              <div\n                class=\"tk-marker\"\n                :style=\"{ left: Math.max(0, Math.min(100, ((Number(msg.payload.g_lat || 0) + 3) / 6) * 100)) + '%' }\">\n              </div>\n            </div>\n            <span>3</span>\n          </div>\n        </div>\n\n        <div class=\"tk-card\">\n          <div class=\"tk-label\">G longitudinal</div>\n          <div class=\"tk-value\">{{ Number(msg.payload.g_lon || 0).toFixed(3) }} <span>G</span></div>\n          <div class=\"tk-mini-scale\">\n            <span>-3</span>\n            <div class=\"tk-scale-line\">\n              <div\n                class=\"tk-marker\"\n                :style=\"{ left: Math.max(0, Math.min(100, ((Number(msg.payload.g_lon || 0) + 3) / 6) * 100)) + '%' }\">\n              </div>\n            </div>\n            <span>3</span>\n          </div>\n        </div>\n\n        <div class=\"tk-card tk-wide\">\n          <div class=\"tk-label\">Velocidad GPS</div>\n          <div class=\"tk-value\">\n            {{ Number(msg.payload.gps_speed_mps || 0).toFixed(2) }}\n            <span>m/s</span>\n          </div>\n          <div class=\"tk-note\">\n            {{ (Number(msg.payload.gps_speed_mps || 0) * 3.6).toFixed(1) }} km/h\n          </div>\n        </div>\n      </div>\n    </section>\n\n    <!-- GPS -->\n    <section class=\"tk-section\">\n      <div class=\"tk-section-title\">\n        <span>Posición GPS</span>\n        <small>Fix · coordenadas · rumbo</small>\n      </div>\n\n      <div\n        class=\"tk-gps-card\"\n        :class=\"Number(msg.payload.gps_fix || 0) === 1 ? 'gps-ok' : 'gps-bad'\">\n\n        <div class=\"tk-gps-top\">\n          <div>\n            <div class=\"tk-gps-title\">\n              {{ Number(msg.payload.gps_fix || 0) === 1 ? 'Señal GPS activa' : 'GPS sin fix' }}\n            </div>\n            <div class=\"tk-gps-sub\">\n              {{ Number(msg.payload.gps_fix || 0) === 1 ? 'Coordenadas válidas' : 'Esperando señal satelital' }}\n            </div>\n          </div>\n\n          <div class=\"tk-pill\">\n            {{ Number(msg.payload.gps_fix || 0) === 1 ? 'FIX' : 'SIN FIX' }}\n          </div>\n        </div>\n\n        <div class=\"tk-gps-grid\">\n          <div>\n            <span>Latitud</span>\n            <strong>\n              {{ Number(msg.payload.gps_fix || 0) === 1 ? Number(msg.payload.lat || 0).toFixed(6) : 'Sin señal' }}\n            </strong>\n          </div>\n\n          <div>\n            <span>Longitud</span>\n            <strong>\n              {{ Number(msg.payload.gps_fix || 0) === 1 ? Number(msg.payload.lon || 0).toFixed(6) : 'Sin señal' }}\n            </strong>\n          </div>\n\n          <div>\n            <span>Satélites</span>\n            <strong>{{ Number(msg.payload.gps_sats || 0) }}</strong>\n          </div>\n\n          <div>\n            <span>HDOP</span>\n            <strong>\n              {{ Number(msg.payload.gps_fix || 0) === 1 ? Number(msg.payload.gps_hdop || 0).toFixed(2) : '—' }}\n            </strong>\n          </div>\n\n          <div>\n            <span>Rumbo</span>\n            <strong>{{ Number(msg.payload.gps_course_deg || 0).toFixed(1) }} °</strong>\n          </div>\n\n          <div>\n            <span>Velocidad</span>\n            <strong>{{ Number(msg.payload.gps_speed_mps || 0).toFixed(2) }} m/s</strong>\n          </div>\n        </div>\n      </div>\n    </section>\n\n  </div>\n</template>\n\n<style>\n.tk-dashboard {\n  width: 100%;\n  box-sizing: border-box;\n  font-family: Arial, Helvetica, sans-serif;\n  color: #111827;\n  padding: 4px;\n}\n\n.tk-hero {\n  border-radius: 18px;\n  padding: 18px;\n  margin-bottom: 14px;\n  background: linear-gradient(135deg, #111827, #1f2937);\n  color: white;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n.tk-title {\n  font-size: 25px;\n  font-weight: 800;\n  letter-spacing: -0.5px;\n}\n\n.tk-subtitle {\n  font-size: 13px;\n  opacity: 0.8;\n  margin-top: 4px;\n}\n\n.tk-live {\n  font-size: 12px;\n  font-weight: 800;\n  background: rgba(255,255,255,0.12);\n  border-radius: 999px;\n  padding: 8px 12px;\n  display: flex;\n  align-items: center;\n  gap: 7px;\n}\n\n.tk-dot {\n  width: 9px;\n  height: 9px;\n  border-radius: 999px;\n  background: #22c55e;\n  display: inline-block;\n  box-shadow: 0 0 10px #22c55e;\n}\n\n.tk-status-row {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 9px;\n  margin-bottom: 14px;\n}\n\n.tk-status-card {\n  background: #ffffff;\n  border-radius: 14px;\n  padding: 12px;\n  border: 1px solid #e5e7eb;\n}\n\n.tk-status-card span {\n  display: block;\n  font-size: 12px;\n  opacity: 0.65;\n}\n\n.tk-status-card strong {\n  display: block;\n  margin-top: 4px;\n  font-size: 20px;\n}\n\n.tk-section {\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  border-radius: 18px;\n  padding: 14px;\n  margin-bottom: 14px;\n}\n\n.tk-section-title {\n  display: flex;\n  justify-content: space-between;\n  align-items: baseline;\n  margin-bottom: 12px;\n}\n\n.tk-section-title span {\n  font-size: 18px;\n  font-weight: 800;\n}\n\n.tk-section-title small {\n  font-size: 12px;\n  opacity: 0.6;\n}\n\n.tk-grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 10px;\n}\n\n.tk-card {\n  background: #f8fafc;\n  border-radius: 16px;\n  padding: 13px;\n  border: 1px solid #eef2f7;\n}\n\n.tk-wide {\n  grid-column: span 2;\n}\n\n.tk-label {\n  font-size: 13px;\n  opacity: 0.72;\n  margin-bottom: 6px;\n}\n\n.tk-value {\n  font-size: 28px;\n  font-weight: 850;\n  line-height: 1.05;\n}\n\n.tk-value span {\n  font-size: 14px;\n  font-weight: 600;\n  opacity: 0.75;\n}\n\n.tk-note {\n  font-size: 12px;\n  opacity: 0.68;\n  margin-top: 7px;\n}\n\n.tk-bar {\n  height: 8px;\n  background: #e5e7eb;\n  border-radius: 999px;\n  overflow: hidden;\n  margin-top: 10px;\n}\n\n.tk-fill {\n  height: 100%;\n  border-radius: 999px;\n  background: linear-gradient(90deg, #22c55e, #facc15, #ef4444);\n}\n\n.tk-mini-scale {\n  display: grid;\n  grid-template-columns: 34px 1fr 34px;\n  align-items: center;\n  gap: 6px;\n  margin-top: 12px;\n  font-size: 11px;\n  opacity: 0.75;\n}\n\n.tk-scale-line {\n  position: relative;\n  height: 7px;\n  background: #e5e7eb;\n  border-radius: 999px;\n}\n\n.tk-marker {\n  position: absolute;\n  top: -5px;\n  width: 5px;\n  height: 17px;\n  border-radius: 999px;\n  background: #111827;\n}\n\n.tk-gps-card {\n  border-radius: 18px;\n  padding: 16px;\n  border: 1px solid #e5e7eb;\n}\n\n.gps-ok {\n  border-left: 8px solid #22c55e;\n  background: #fbfffd;\n}\n\n.gps-bad {\n  border-left: 8px solid #ef4444;\n  background: #fffafa;\n}\n\n.tk-gps-top {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 14px;\n}\n\n.tk-gps-title {\n  font-size: 21px;\n  font-weight: 850;\n}\n\n.tk-gps-sub {\n  font-size: 13px;\n  opacity: 0.7;\n  margin-top: 4px;\n}\n\n.tk-pill {\n  border-radius: 999px;\n  padding: 8px 12px;\n  background: #fee2e2;\n  color: #991b1b;\n  font-weight: 850;\n  font-size: 12px;\n}\n\n.gps-ok .tk-pill {\n  background: #dcfce7;\n  color: #166534;\n}\n\n.tk-gps-grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 10px;\n}\n\n.tk-gps-grid div {\n  background: #f3f4f6;\n  border-radius: 14px;\n  padding: 12px;\n}\n\n.tk-gps-grid span {\n  display: block;\n  font-size: 12px;\n  opacity: 0.65;\n  margin-bottom: 6px;\n}\n\n.tk-gps-grid strong {\n  font-size: 17px;\n}\n\n@media (max-width: 520px) {\n  .tk-hero {\n    align-items: flex-start;\n    flex-direction: column;\n    gap: 10px;\n  }\n\n  .tk-status-row {\n    grid-template-columns: 1fr;\n  }\n\n  .tk-grid {\n    grid-template-columns: 1fr;\n  }\n\n  .tk-wide {\n    grid-column: span 1;\n  }\n\n  .tk-gps-grid {\n    grid-template-columns: 1fr;\n  }\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 630,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5a0f6d64f29ca61d",
+        "type": "ui-template",
+        "z": "f3aa4012cfc3fa44",
+        "group": "a439fc3a19fb6bf4",
+        "page": "",
+        "ui": "",
+        "name": "Visualización",
+        "order": 0,
+        "width": "6",
+        "height": "27",
+        "head": "",
+        "format": "<template>\n    <div class=\"tk-graphs\">\n\n        <div class=\"ghero\">\n            <div>\n                <div class=\"gtitle\">Gráficas en vivo</div>\n                <div class=\"gsub\">Histórico de los últimos {{ maxPoints }} paquetes recibidos</div>\n            </div>\n            <div class=\"gpill\">{{ pointsCount }} datos</div>\n        </div>\n\n        <div class=\"gstats\">\n            <div>\n                <span>Paquete</span>\n                <strong>#{{ last.seq ?? 0 }}</strong>\n            </div>\n            <div>\n                <span>RSSI</span>\n                <strong>{{ fmt(last.rssi, 0) }} dBm</strong>\n            </div>\n            <div>\n                <span>SNR</span>\n                <strong>{{ fmt(last.snr, 2) }} dB</strong>\n            </div>\n        </div>\n\n        <section class=\"gsection\">\n            <div class=\"gsection-title\">Orientación y giro</div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>Roll</strong>\n                    <span>{{ fmt(last.roll, 2) }} °</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <line x1=\"0\" y1=\"55\" x2=\"300\" y2=\"55\" class=\"zero\" />\n                    <polyline :points=\"points('roll', -180, 180)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>-180°</span><span>180°</span></div>\n            </div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>Pitch</strong>\n                    <span>{{ fmt(last.pitch, 2) }} °</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <line x1=\"0\" y1=\"55\" x2=\"300\" y2=\"55\" class=\"zero\" />\n                    <polyline :points=\"points('pitch', -90, 90)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>-90°</span><span>90°</span></div>\n            </div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>Yaw rate</strong>\n                    <span>{{ fmt(last.yaw_rate, 2) }} °/s</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <line x1=\"0\" y1=\"55\" x2=\"300\" y2=\"55\" class=\"zero\" />\n                    <polyline :points=\"points('yaw_rate', -300, 300)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>-300°/s</span><span>300°/s</span></div>\n            </div>\n        </section>\n\n        <section class=\"gsection\">\n            <div class=\"gsection-title\">Dinámica</div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>G lateral</strong>\n                    <span>{{ fmt(last.g_lat, 3) }} G</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <line x1=\"0\" y1=\"55\" x2=\"300\" y2=\"55\" class=\"zero\" />\n                    <polyline :points=\"points('g_lat', -3, 3)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>-3 G</span><span>3 G</span></div>\n            </div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>G longitudinal</strong>\n                    <span>{{ fmt(last.g_lon, 3) }} G</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <line x1=\"0\" y1=\"55\" x2=\"300\" y2=\"55\" class=\"zero\" />\n                    <polyline :points=\"points('g_lon', -3, 3)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>-3 G</span><span>3 G</span></div>\n            </div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>Velocidad GPS</strong>\n                    <span>{{ fmt(last.gps_speed_mps, 2) }} m/s</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <line x1=\"0\" y1=\"100\" x2=\"300\" y2=\"100\" class=\"zero\" />\n                    <polyline :points=\"points('gps_speed_mps', 0, 30)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>0 m/s</span><span>30 m/s</span></div>\n            </div>\n        </section>\n\n        <section class=\"gsection\">\n            <div class=\"gsection-title\">Enlace inalámbrico</div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>RSSI</strong>\n                    <span>{{ fmt(last.rssi, 0) }} dBm</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <polyline :points=\"points('rssi', -120, -20)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>-120</span><span>-20 dBm</span></div>\n            </div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>SNR</strong>\n                    <span>{{ fmt(last.snr, 2) }} dB</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <line x1=\"0\" y1=\"55\" x2=\"300\" y2=\"55\" class=\"zero\" />\n                    <polyline :points=\"points('snr', -20, 20)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>-20 dB</span><span>20 dB</span></div>\n            </div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>Paquetes perdidos</strong>\n                    <span>{{ fmt(last.lost, 0) }}</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <polyline :points=\"pointsAuto('lost')\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>0</span><span>acumulado</span></div>\n            </div>\n        </section>\n\n        <section class=\"gsection\">\n            <div class=\"gsection-title\">GPS</div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>Satélites</strong>\n                    <span>{{ fmt(last.gps_sats, 0) }}</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <polyline :points=\"points('gps_sats', 0, 20)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>0</span><span>20 sat</span></div>\n            </div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>HDOP</strong>\n                    <span>{{ last.gps_fix === 1 ? fmt(last.gps_hdop, 2) : 'sin fix' }}</span>\n                </div>\n                <svg viewBox=\"0 0 300 110\" preserveAspectRatio=\"none\">\n                    <polyline :points=\"points('gps_hdop', 0, 10)\" class=\"line\" />\n                </svg>\n                <div class=\"axis\"><span>0</span><span>10</span></div>\n            </div>\n\n            <div class=\"chart-card\">\n                <div class=\"chart-head\">\n                    <strong>Trayectoria GPS</strong>\n                    <span>{{ gpsTrack.length }} puntos</span>\n                </div>\n\n                <svg viewBox=\"0 0 300 160\" preserveAspectRatio=\"none\" class=\"map\">\n                    <rect x=\"0\" y=\"0\" width=\"300\" height=\"160\" rx=\"10\" class=\"map-bg\" />\n                    <polyline :points=\"gpsPoints()\" class=\"track\" />\n                    <circle v-if=\"gpsTrack.length > 0\" :cx=\"lastGpsPoint().x\" :cy=\"lastGpsPoint().y\" r=\"4\"\n                        class=\"last-dot\" />\n                </svg>\n\n                <div class=\"axis\">\n                    <span>{{ last.gps_fix === 1 ? Number(last.lat || 0).toFixed(5) : 'Sin fix' }}</span>\n                    <span>{{ last.gps_fix === 1 ? Number(last.lon || 0).toFixed(5) : '' }}</span>\n                </div>\n            </div>\n        </section>\n\n    </div>\n</template>\n\n<script>\n    export default {\n  data() {\n    return {\n      maxPoints: 120,\n      lastSeq: null,\n      last: {},\n      series: {\n        roll: [],\n        pitch: [],\n        yaw_rate: [],\n        g_lat: [],\n        g_lon: [],\n        gps_speed_mps: [],\n        rssi: [],\n        snr: [],\n        lost: [],\n        gps_sats: [],\n        gps_hdop: []\n      },\n      gpsTrack: []\n    }\n  },\n\n  computed: {\n    pointsCount() {\n      return this.series.roll.length\n    }\n  },\n\n  watch: {\n    msg: {\n      handler(newMsg) {\n        if (!newMsg || !newMsg.payload) return\n\n        const d = newMsg.payload\n        const seq = Number(d.seq)\n\n        if (this.lastSeq === seq) return\n        this.lastSeq = seq\n        this.last = d\n\n        Object.keys(this.series).forEach(k => {\n          let v = Number(d[k])\n          if (k === \"gps_hdop\" && Number(d.gps_fix) !== 1) v = 10\n          if (Number.isFinite(v)) this.push(k, v)\n        })\n\n        const fix = Number(d.gps_fix)\n        const lat = Number(d.lat)\n        const lon = Number(d.lon)\n\n        if (fix === 1 && lat !== 0 && lon !== 0 && Number.isFinite(lat) && Number.isFinite(lon)) {\n          this.gpsTrack.push({ lat, lon })\n          if (this.gpsTrack.length > this.maxPoints) this.gpsTrack.shift()\n        }\n      },\n      deep: true\n    }\n  },\n\n  methods: {\n    fmt(v, n) {\n      const x = Number(v)\n      if (!Number.isFinite(x)) return \"--\"\n      return x.toFixed(n)\n    },\n\n    push(k, v) {\n      this.series[k].push(v)\n      if (this.series[k].length > this.maxPoints) this.series[k].shift()\n    },\n\n    points(k, min, max) {\n      const arr = this.series[k] || []\n      if (arr.length < 2) return \"\"\n\n      return arr.map((v, i) => {\n        const x = (i / (this.maxPoints - 1)) * 300\n        const clamped = Math.max(min, Math.min(max, v))\n        const y = 105 - ((clamped - min) / (max - min)) * 100\n        return `${x.toFixed(1)},${y.toFixed(1)}`\n      }).join(\" \")\n    },\n\n    pointsAuto(k) {\n      const arr = this.series[k] || []\n      if (arr.length < 2) return \"\"\n\n      const min = 0\n      const max = Math.max(1, ...arr)\n\n      return arr.map((v, i) => {\n        const x = (i / (this.maxPoints - 1)) * 300\n        const y = 105 - ((v - min) / (max - min)) * 100\n        return `${x.toFixed(1)},${y.toFixed(1)}`\n      }).join(\" \")\n    },\n\n    gpsPoints() {\n      if (this.gpsTrack.length < 2) return \"\"\n\n      const lats = this.gpsTrack.map(p => p.lat)\n      const lons = this.gpsTrack.map(p => p.lon)\n\n      const minLat = Math.min(...lats)\n      const maxLat = Math.max(...lats)\n      const minLon = Math.min(...lons)\n      const maxLon = Math.max(...lons)\n\n      const dLat = Math.max(1e-9, maxLat - minLat)\n      const dLon = Math.max(1e-9, maxLon - minLon)\n\n      return this.gpsTrack.map(p => {\n        const x = 15 + ((p.lon - minLon) / dLon) * 270\n        const y = 145 - ((p.lat - minLat) / dLat) * 130\n        return `${x.toFixed(1)},${y.toFixed(1)}`\n      }).join(\" \")\n    },\n\n    lastGpsPoint() {\n      const pts = this.gpsPoints().trim().split(\" \")\n      if (!pts.length || pts[0] === \"\") return { x: 0, y: 0 }\n\n      const last = pts[pts.length - 1].split(\",\")\n      return {\n        x: Number(last[0]),\n        y: Number(last[1])\n      }\n    }\n  }\n}\n</script>\n\n<style>\n    .tk-graphs {\n        width: 100%;\n        box-sizing: border-box;\n        font-family: Arial, Helvetica, sans-serif;\n        color: #111827;\n        padding: 4px;\n    }\n\n    .ghero {\n        border-radius: 18px;\n        padding: 18px;\n        margin-bottom: 14px;\n        background: linear-gradient(135deg, #0f172a, #1e293b);\n        color: white;\n        display: flex;\n        justify-content: space-between;\n        align-items: center;\n    }\n\n    .gtitle {\n        font-size: 24px;\n        font-weight: 850;\n    }\n\n    .gsub {\n        font-size: 13px;\n        opacity: 0.78;\n        margin-top: 4px;\n    }\n\n    .gpill {\n        border-radius: 999px;\n        padding: 8px 12px;\n        background: rgba(255, 255, 255, 0.12);\n        font-size: 12px;\n        font-weight: 800;\n    }\n\n    .gstats {\n        display: grid;\n        grid-template-columns: repeat(3, 1fr);\n        gap: 9px;\n        margin-bottom: 14px;\n    }\n\n    .gstats div {\n        background: #ffffff;\n        border: 1px solid #e5e7eb;\n        border-radius: 14px;\n        padding: 12px;\n    }\n\n    .gstats span {\n        display: block;\n        font-size: 12px;\n        opacity: 0.65;\n    }\n\n    .gstats strong {\n        display: block;\n        margin-top: 4px;\n        font-size: 18px;\n    }\n\n    .gsection {\n        background: #ffffff;\n        border: 1px solid #e5e7eb;\n        border-radius: 18px;\n        padding: 14px;\n        margin-bottom: 14px;\n    }\n\n    .gsection-title {\n        font-size: 18px;\n        font-weight: 850;\n        margin-bottom: 12px;\n    }\n\n    .chart-card {\n        background: #f8fafc;\n        border-radius: 16px;\n        border: 1px solid #eef2f7;\n        padding: 12px;\n        margin-bottom: 10px;\n    }\n\n    .chart-head {\n        display: flex;\n        justify-content: space-between;\n        align-items: baseline;\n        margin-bottom: 8px;\n    }\n\n    .chart-head strong {\n        font-size: 15px;\n    }\n\n    .chart-head span {\n        font-size: 14px;\n        font-weight: 800;\n    }\n\n    svg {\n        width: 100%;\n        height: 120px;\n        background: #ffffff;\n        border-radius: 12px;\n        border: 1px solid #e5e7eb;\n    }\n\n    .zero {\n        stroke: #9ca3af;\n        stroke-width: 1;\n        stroke-dasharray: 4 4;\n    }\n\n    .line {\n        fill: none;\n        stroke: #2563eb;\n        stroke-width: 3;\n        stroke-linejoin: round;\n        stroke-linecap: round;\n    }\n\n    .axis {\n        display: flex;\n        justify-content: space-between;\n        font-size: 11px;\n        opacity: 0.62;\n        margin-top: 5px;\n    }\n\n    .map {\n        height: 170px;\n    }\n\n    .map-bg {\n        fill: #f8fafc;\n        stroke: #e5e7eb;\n    }\n\n    .track {\n        fill: none;\n        stroke: #16a34a;\n        stroke-width: 3;\n        stroke-linejoin: round;\n        stroke-linecap: round;\n    }\n\n    .last-dot {\n        fill: #dc2626;\n    }\n\n    @media (max-width: 520px) {\n        .ghero {\n            flex-direction: column;\n            align-items: flex-start;\n            gap: 10px;\n        }\n\n        .gstats {\n            grid-template-columns: 1fr;\n        }\n    }\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 610,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d35cb97722851c9e",
+        "type": "function",
+        "z": "f3aa4012cfc3fa44",
+        "name": "Guardar CSV",
+        "func": "let d = msg.payload;\n\nlet header = [\n    \"t_pc\",\n    \"seq\",\n    \"t_ms\",\n    \"roll\",\n    \"pitch\",\n    \"g_lat\",\n    \"g_lon\",\n    \"yaw_rate\",\n    \"lat\",\n    \"lon\",\n    \"gps_speed_mps\",\n    \"gps_course_deg\",\n    \"gps_sats\",\n    \"gps_hdop\",\n    \"gps_fix\",\n    \"rssi\",\n    \"snr\",\n    \"lost\",\n    \"total\"\n].join(\",\") + \"\\n\";\n\nlet line = [\n    new Date().toISOString(),\n    d.seq,\n    d.t_ms,\n    d.roll,\n    d.pitch,\n    d.g_lat,\n    d.g_lon,\n    d.yaw_rate,\n    d.lat,\n    d.lon,\n    d.gps_speed_mps,\n    d.gps_course_deg,\n    d.gps_sats,\n    d.gps_hdop,\n    d.gps_fix,\n    d.rssi,\n    d.snr,\n    d.lost,\n    d.total\n].join(\",\") + \"\\n\";\n\nif (!context.get(\"headerWritten\")) {\n    msg.payload = header + line;\n    context.set(\"headerWritten\", true);\n} else {\n    msg.payload = line;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 280,
+        "wires": [
+            [
+                "6fc192eba0e5e389"
+            ]
+        ]
+    },
+    {
+        "id": "b1389ee30add6dad",
+        "type": "ui-button",
+        "z": "f3aa4012cfc3fa44",
+        "group": "4491c66f55ac6bf2",
+        "name": "Analizar sesión",
+        "label": "button",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 620,
+        "y": 360,
+        "wires": [
+            [
+                "2944cdd92ba3ba25"
+            ]
+        ]
+    },
+    {
+        "id": "bcea8335d0baaaea",
+        "type": "json",
+        "z": "f3aa4012cfc3fa44",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 1050,
+        "y": 360,
+        "wires": [
+            [
+                "a7034c278cbff7cb"
+            ]
+        ]
+    },
+    {
+        "id": "2944cdd92ba3ba25",
+        "type": "exec",
+        "z": "f3aa4012cfc3fa44",
+        "command": "python",
+        "addpay": "",
+        "append": "C:\\TelemetriaKart\\analizar_sesion.py",
+        "useSpawn": "false",
+        "timer": "10",
+        "winHide": false,
+        "oldrc": false,
+        "name": "ejecutar análisis Python",
+        "x": 850,
+        "y": 360,
+        "wires": [
+            [
+                "bcea8335d0baaaea"
+            ],
+            [
+                "6ca72428e9739190"
+            ],
+            [
+                "04eecab2afaf0a66"
+            ]
+        ]
+    },
+    {
+        "id": "a7034c278cbff7cb",
+        "type": "ui-template",
+        "z": "f3aa4012cfc3fa44",
+        "group": "4491c66f55ac6bf2",
+        "page": "",
+        "ui": "",
+        "name": "Data",
+        "order": 0,
+        "width": "6",
+        "height": "10",
+        "head": "",
+        "format": "<template>\n  <div class=\"plot-report\" v-if=\"msg && msg.payload\">\n    <div class=\"plot-hero\">\n      <div>\n        <div class=\"plot-title\">Reporte gráfico de sesión</div>\n        <div class=\"plot-subtitle\">Generado con Python desde el CSV guardado por Node-RED</div>\n      </div>\n      <div class=\"plot-pill\" :class=\"msg.payload.ok ? 'ok' : 'bad'\">\n        {{ msg.payload.ok ? 'OK' : 'ERROR' }}\n      </div>\n    </div>\n\n    <div v-if=\"!msg.payload.ok\" class=\"plot-error\">\n      {{ msg.payload.error }}\n    </div>\n\n    <div v-else>\n      <div class=\"plot-grid\">\n        <div>\n          <span>Muestras</span>\n          <strong>{{ msg.payload.resumen.muestras }}</strong>\n        </div>\n        <div>\n          <span>Duración</span>\n          <strong>{{ msg.payload.resumen.duracion_s }} s</strong>\n        </div>\n        <div>\n          <span>Tasa LoRa</span>\n          <strong>{{ msg.payload.resumen.tasa_lora_hz }} Hz</strong>\n        </div>\n        <div>\n          <span>GPS fix</span>\n          <strong>{{ msg.payload.resumen.gps_fix_pct }} %</strong>\n        </div>\n      </div>\n\n      <section class=\"plot-section\">\n        <h3>Orientación y giro</h3>\n        <img :src=\"'data:image/png;base64,' + msg.payload.imagenes.orientacion\">\n      </section>\n\n      <section class=\"plot-section\">\n        <h3>Dinámica</h3>\n        <img :src=\"'data:image/png;base64,' + msg.payload.imagenes.dinamica\">\n      </section>\n\n      <section class=\"plot-section\">\n        <h3>Enlace LoRa</h3>\n        <img :src=\"'data:image/png;base64,' + msg.payload.imagenes.enlace\">\n      </section>\n\n      <section class=\"plot-section\">\n        <h3>Trayectoria GPS</h3>\n        <img :src=\"'data:image/png;base64,' + msg.payload.imagenes.gps\">\n      </section>\n    </div>\n  </div>\n</template>\n\n<style>\n.plot-report {\n  font-family: Arial, Helvetica, sans-serif;\n  color: #111827;\n  padding: 4px;\n}\n\n.plot-hero {\n  border-radius: 18px;\n  padding: 18px;\n  margin-bottom: 14px;\n  background: linear-gradient(135deg, #111827, #1f2937);\n  color: white;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n.plot-title {\n  font-size: 24px;\n  font-weight: 850;\n}\n\n.plot-subtitle {\n  font-size: 13px;\n  opacity: 0.78;\n  margin-top: 4px;\n}\n\n.plot-pill {\n  border-radius: 999px;\n  padding: 8px 12px;\n  font-size: 12px;\n  font-weight: 850;\n}\n\n.plot-pill.ok {\n  background: #dcfce7;\n  color: #166534;\n}\n\n.plot-pill.bad {\n  background: #fee2e2;\n  color: #991b1b;\n}\n\n.plot-error {\n  background: #fee2e2;\n  border: 1px solid #fecaca;\n  color: #991b1b;\n  border-radius: 14px;\n  padding: 14px;\n  font-weight: 700;\n}\n\n.plot-grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 10px;\n  margin-bottom: 14px;\n}\n\n.plot-grid div {\n  background: #f8fafc;\n  border: 1px solid #e5e7eb;\n  border-radius: 14px;\n  padding: 12px;\n}\n\n.plot-grid span {\n  display: block;\n  font-size: 12px;\n  opacity: 0.65;\n  margin-bottom: 5px;\n}\n\n.plot-grid strong {\n  font-size: 20px;\n}\n\n.plot-section {\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  border-radius: 16px;\n  padding: 12px;\n  margin-bottom: 14px;\n}\n\n.plot-section h3 {\n  margin: 0 0 10px 0;\n}\n\n.plot-section img {\n  width: 100%;\n  border-radius: 12px;\n  border: 1px solid #e5e7eb;\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1190,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6fc192eba0e5e389",
+        "type": "file",
+        "z": "f3aa4012cfc3fa44",
+        "name": "",
+        "filename": "C:\\TelemetriaKart\\data\\sesion_actual.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 900,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6ca72428e9739190",
+        "type": "debug",
+        "z": "f3aa4012cfc3fa44",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1120,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "04eecab2afaf0a66",
+        "type": "debug",
+        "z": "f3aa4012cfc3fa44",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1120,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "9aa00f516edbe481",
+        "type": "serial-port",
+        "name": "",
+        "serialport": "COM4",
+        "serialbaud": "115200",
+        "databits": 8,
+        "parity": "none",
+        "stopbits": 1,
+        "waitfor": "",
+        "dtr": "none",
+        "rts": "none",
+        "cts": "none",
+        "dsr": "none",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": "",
+        "responsetimeout": 10000
+    },
+    {
+        "id": "77c4effe944a6bc8",
+        "type": "ui-group",
+        "name": "Telemetría Kart",
+        "page": "95ee3a9efc088324",
+        "width": 6,
+        "height": 1,
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "a439fc3a19fb6bf4",
+        "type": "ui-group",
+        "name": "Histórico en vivo",
+        "page": "f1f30b3ff3cd19c4",
+        "width": 6,
+        "height": 1,
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "4491c66f55ac6bf2",
+        "type": "ui-group",
+        "name": "Resumen de sesión",
+        "page": "6267db063a3fe5ac",
+        "width": 6,
+        "height": 1,
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "95ee3a9efc088324",
+        "type": "ui-page",
+        "name": "Panel de Datos",
+        "ui": "2aa576ab10c7e5a2",
+        "path": "/page5",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "834b7823cf09f5a9",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "f1f30b3ff3cd19c4",
+        "type": "ui-page",
+        "name": "Gráficas",
+        "ui": "2aa576ab10c7e5a2",
+        "path": "/page2",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "834b7823cf09f5a9",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "6267db063a3fe5ac",
+        "type": "ui-page",
+        "name": "Análisis",
+        "ui": "2aa576ab10c7e5a2",
+        "path": "/page3",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "834b7823cf09f5a9",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "2aa576ab10c7e5a2",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "834b7823cf09f5a9",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "69f120e1139b04b1",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-serialport": "2.0.3",
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
