@@ -470,9 +470,37 @@ python analisis_sesion_lora.py C:\TelemetriaKart\data\sesion_actual.csv
 
 ---
 
-### 9.3 Python en vivo, sin Node-RED
+### 9.3 Python en vivo
 
 Está en `scripts/live/`.
+
+#### `puente_mqtt_v2.py`
+
+Es el puente que usamos actualmente. Lee el serial de la ESP32 base, publica
+todo en el broker MQTT local y guarda un CSV de respaldo. La novedad frente a la
+versión anterior es que además **calcula velocidad y distancia** en el
+computador, sin necesidad de tocar el firmware: usa la aceleración (`g_lon`) y
+la velocidad del GPS que ya vienen en el paquete.
+
+Publica en cuatro tópicos:
+
+```text
+kart/K01/imu        roll, pitch, g_lat, g_lon, aceleración, yaw_rate
+kart/K01/gps        lat, lon, velocidad GPS, rumbo, satélites, hdop, fix
+kart/K01/derivado   velocidad fusionada, velocidad por IMU, distancia, bias
+kart/K01/radio      rssi, snr, perdidos, total, % de pérdida
+```
+
+```bash
+python puente_mqtt_v2.py COM4
+python puente_mqtt_v2.py COM4 --rgps 0.3 --broker 192.168.0.13
+```
+
+Requiere Mosquitto corriendo antes. En la consola va mostrando la velocidad en
+km/h, la distancia acumulada y el estado del enlace.
+
+Reemplaza a `puente_serial_mqtt.py`, que se conserva en `legacy_mqtt/` como
+historial.
 
 #### `telemetria_live_python_OK.py`
 
@@ -572,6 +600,29 @@ python detectar_vueltas.py KART023.CSV --nvueltas 4
 Requiere buena cobertura GPS para funcionar bien. Con poca disponibilidad de fix
 las vueltas detectadas no son confiables.
 
+#### `velocidad_distancia_sd.py`
+
+Calcula la velocidad fusionada y la distancia recorrida a partir de un archivo
+de la microSD, a 100 Hz. Usa un filtro de Kalman que predice con la aceleración
+longitudinal y corrige con la velocidad del GPS, igual que el puente en vivo
+pero con toda la resolución.
+
+Grafica tres estimaciones de velocidad —integrando solo el acelerómetro, la del
+GPS y la fusionada— lo que muestra de un vistazo por qué hace falta el filtro:
+la integración pura se dispara mientras la fusionada sigue la realidad. También
+compara tres formas de calcular la distancia (fusionada, solo GPS y geométrica
+a partir de lat/lon), que sirven para validarse entre sí.
+
+Detecta solo el formato del archivo (18, 21 o 23 columnas según la versión de
+firmware con que se grabó).
+
+```bash
+python velocidad_distancia_sd.py KART023.CSV
+python velocidad_distancia_sd.py KART023.CSV --rgps 0.3
+```
+
+Genera un PNG con las gráficas y un CSV con las columnas nuevas agregadas.
+
 #### `comparar_sd_lora.py`
 
 Compara la grabación a bordo con la telemetría que llegó por radio en la misma
@@ -629,9 +680,10 @@ primera etapa, aunque sigan siendo funcionales).
 
 #### `puente_serial_mqtt.py`
 
-Lee el serial del receptor LoRa, publica cada trama en los tópicos
-`kart/K01/imu/filt` (los datos del kart) y `kart/K01/radio` (RSSI, SNR y
-pérdidas), y guarda además un CSV de respaldo con la hora de recepción.
+Versión anterior del puente, reemplazada por `puente_mqtt_v2.py` (sección 9.3).
+Se conserva porque fue la que generó los archivos `lora_*.csv` de la campaña del
+24/07. Lee el serial del receptor LoRa, publica cada trama en los tópicos
+`kart/K01/imu/filt` y `kart/K01/radio`, y guarda un CSV de respaldo.
 
 ```bash
 python puente_serial_mqtt.py COM3
@@ -661,10 +713,36 @@ python suscriptor_mqtt.py
 ```
 
 **Cuál usar.** Para una prueba rápida, Node-RED o la aplicación en Python son más
-directos. El puente MQTT tiene sentido cuando se quiere que varios programas
-consuman los mismos datos al tiempo, o cuando interesa dejar el registro corriendo
-aparte del dashboard. Los dos caminos son válidos; lo único que no se puede es
-usarlos a la vez, porque el puerto COM solo admite un programa.
+directos. El puente MQTT (`puente_mqtt_v2.py`) tiene sentido cuando se quiere que
+varios programas consuman los mismos datos al tiempo, o cuando interesa ver
+velocidad y distancia además de lo que transmite el kart. Los caminos son
+válidos; lo único que no se puede es usarlos a la vez, porque el puerto COM solo
+admite un programa.
+
+---
+
+### 9.7 Velocidad y distancia: dónde se calculan
+
+Ni la velocidad fusionada ni la distancia vienen dentro del paquete LoRa: se
+calculan en el computador a partir de la aceleración y la velocidad del GPS, que
+sí se transmiten. Esto evita tocar el firmware y permite mejorar el cálculo sin
+volver a programar el kart.
+
+Se hace en dos lugares según el momento:
+
+| Momento | Script | Frecuencia |
+|---|---|---|
+| Durante la prueba | `puente_mqtt_v2.py` | 2 Hz (lo que llega por radio) |
+| Después, para el informe | `velocidad_distancia_sd.py` | 100 Hz (desde la microSD) |
+
+Ambos usan el mismo filtro con los mismos parámetros, de modo que los números
+coinciden; lo único que cambia es la resolución. El de la microSD es el que se
+usa para los resultados del informe, porque no depende de lo que la radio
+alcance a transmitir.
+
+Si algún día se quisiera que la velocidad y la distancia viajaran dentro del
+paquete LoRa (para verlas en Node-RED sin Python), el procedimiento está
+documentado en `docs/PATCH_velocidad_distancia.md`. No está aplicado.
 
 ---
 
